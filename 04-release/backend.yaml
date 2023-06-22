@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: billing-service
+  namespace: backend
+  labels:
+    tipo: microservicio
+    app: billing-service-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tipo: microservicio
+      app: billing-service-backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        tipo: microservicio
+        app: billing-service-backend
+    spec:
+      containers:
+        - name: billing-service
+          image: k3d-registry:5001/billing-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 5000
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-service
+  namespace: backend
+  labels:
+    tipo: microservicio
+    app: billing-service-backend
+spec:
+  ports:
+    - name: grpc
+      protocol: TCP
+      port: 5000
+      targetPort: 5000
+  selector:
+    tipo: microservicio
+    app: billing-service-backend
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custody-service
+  namespace: backend
+  labels:
+    tipo: microservicio
+    app: custody-service-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      tipo: microservicio
+      app: custody-service-backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        tipo: microservicio
+        app: custody-service-backend
+    spec:
+      containers:
+        - name: custody-service
+          image: k3d-registry:5001/custody-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 5000
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: custody-service
+  namespace: backend
+  labels:
+    tipo: microservicio
+    app: custody-service-backend
+spec:
+  ports:
+    - name: grpc
+      protocol: TCP
+      port: 5000
+      targetPort: 5000
+  selector:
+    tipo: microservicio
+    app: custody-service-backend
+  type: ClusterIP              
